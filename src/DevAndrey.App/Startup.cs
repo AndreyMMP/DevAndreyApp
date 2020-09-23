@@ -1,39 +1,26 @@
+using AutoMapper;
+using DevAndrey.App.Configurations;
+using DevAndrey.Data.Context;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using DevAndrey.App.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DevAndrey.Data.Context;
-using DevAndrey.Business.Interfaces;
-using DevAndrey.Data.Repository;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc.DataAnnotations;
-using DevAndrey.App.Extensions;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using System.Collections.Generic;
 
 namespace DevAndrey.App
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        }        
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentityConfiguration(Configuration);
 
             services.AddDbContext<MyDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -43,11 +30,7 @@ namespace DevAndrey.App
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddScoped<MyDbContext>();
-            services.AddScoped<IProdutoRepository, ProdutoRepository>();
-            services.AddScoped<IFornecedorRepository, FornecedorRepository>();
-            services.AddScoped<IEnderecoRepository, EnderecoRepository>();
-            services.AddSingleton<IValidationAttributeAdapterProvider, MoedaValidationAttributeAdapterProvider>();
+            services.ResolveDependencies();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -70,15 +53,7 @@ namespace DevAndrey.App
             app.UseAuthentication();
             app.UseAuthorization();
 
-            var defaultCulture = new CultureInfo("pt-BR");
-            var localizationOptions = new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture(defaultCulture),
-                SupportedCultures = new List<CultureInfo> { defaultCulture },
-                SupportedUICultures = new List<CultureInfo> { defaultCulture }
-            };
-
-            app.UseRequestLocalization(localizationOptions);
+            app.UseGlobalizationConfiguration();
 
             app.UseEndpoints(endpoints =>
             {
