@@ -84,14 +84,32 @@ namespace DevAndrey.App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, ProdutoViewModel produtoViewModel)
         {
-            if (id != produtoViewModel.Id)
+            if (id != produtoViewModel.Id) 
                 return NotFound();
 
-            if (!ModelState.IsValid)
+            var produtoAtualizacao = await ObterProduto(id);
+            produtoViewModel.FornecedorId = produtoAtualizacao.Fornecedor.Id;
+            produtoViewModel.Imagem = produtoAtualizacao.Imagem;
+
+            if (!ModelState.IsValid) {
+                produtoViewModel.Fornecedor = produtoAtualizacao.Fornecedor;
                 return View(produtoViewModel);
+            }
+                
+            if (produtoViewModel.ImagemUpload != null)
+            {
+                var imgPrefixo = Guid.NewGuid() + "_";
+                if (!await UploadArquivo(produtoViewModel.ImagemUpload, imgPrefixo))
+                {
+                    return View(produtoViewModel);
+                }
+
+                produtoViewModel.Imagem = imgPrefixo + produtoViewModel.ImagemUpload.FileName;
+            }
 
             await _produtoRepository.Atualizar(_mapper.Map<Produto>(produtoViewModel));
 
+            //if (!OperacaoValida()) return View(produtoViewModel);
 
             return RedirectToAction("Index");
         }
