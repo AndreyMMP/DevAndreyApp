@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DevAndrey.App.Extensions;
 using Microsoft.AspNetCore.Http;
 
 namespace DevAndrey.App.ViewModels
@@ -31,7 +32,7 @@ namespace DevAndrey.App.ViewModels
 
         public string Imagem { get; set; }
 
-        //[Moeda]
+        [Moeda]
         [Required(ErrorMessage = "O campo {0} é obrigatório")]
         public decimal Valor { get; set; }
 

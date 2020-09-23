@@ -10,6 +10,11 @@ using DevAndrey.Data.Context;
 using DevAndrey.Business.Interfaces;
 using DevAndrey.Data.Repository;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.DataAnnotations;
+using DevAndrey.App.Extensions;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using System.Collections.Generic;
 
 namespace DevAndrey.App
 {
@@ -21,7 +26,7 @@ namespace DevAndrey.App
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -42,6 +47,7 @@ namespace DevAndrey.App
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
             services.AddScoped<IFornecedorRepository, FornecedorRepository>();
             services.AddScoped<IEnderecoRepository, EnderecoRepository>();
+            services.AddSingleton<IValidationAttributeAdapterProvider, MoedaValidationAttributeAdapterProvider>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -53,7 +59,7 @@ namespace DevAndrey.App
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");                
+                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -63,6 +69,16 @@ namespace DevAndrey.App
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            var defaultCulture = new CultureInfo("pt-BR");
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture(defaultCulture),
+                SupportedCultures = new List<CultureInfo> { defaultCulture },
+                SupportedUICultures = new List<CultureInfo> { defaultCulture }
+            };
+
+            app.UseRequestLocalization(localizationOptions);
 
             app.UseEndpoints(endpoints =>
             {
