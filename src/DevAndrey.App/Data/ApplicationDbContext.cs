@@ -15,5 +15,6 @@ namespace DevAndrey.App.Data
         }
         public DbSet<DevAndrey.App.ViewModels.FornecedorViewModel> FornecedorViewModel { get; set; }
         public DbSet<DevAndrey.App.ViewModels.ProdutoViewModel> ProdutoViewModel { get; set; }
+        public DbSet<DevAndrey.App.ViewModels.EnderecoViewModel> EnderecoViewModel { get; set; }
     }
 }

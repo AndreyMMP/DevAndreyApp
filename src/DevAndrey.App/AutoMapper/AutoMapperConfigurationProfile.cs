@@ -9,7 +9,7 @@ namespace DevAndrey.App.AutoMapper
         public AutoMapperConfigurationProfile()
         {
             CreateMap<Fornecedor, FornecedorViewModel>().ReverseMap();
-            CreateMap<Endereco, FornecedorViewModel>().ReverseMap();
+            CreateMap<Endereco, EnderecoViewModel>().ReverseMap();
             CreateMap<Produto, ProdutoViewModel>().ReverseMap();
         }
     }
