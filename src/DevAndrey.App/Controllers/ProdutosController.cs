@@ -9,9 +9,11 @@ using DevAndrey.Business.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
+using DevAndrey.App.Extensions;
 
 namespace DevAndrey.App.Controllers
 {
+    [Authorize]
     public class ProdutosController : BaseController
     {
         private readonly IProdutoRepository _produtoRepository;
@@ -51,12 +53,14 @@ namespace DevAndrey.App.Controllers
 
             return View(produtoViewModel);
         }
+        [ClaimsAuthorize("Produto","Adicionar")]
         [Route("novo-produto")]
         public async Task<IActionResult> Create()
         {
             var produtoViewModel = await PopularFornecedores(new ProdutoViewModel());
             return View(produtoViewModel);
         }
+        [ClaimsAuthorize("Produto", "Adicionar")]
         [Route("novo-produto")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -79,6 +83,7 @@ namespace DevAndrey.App.Controllers
 
             return RedirectToAction("Index");
         }
+        [ClaimsAuthorize("Produto", "Editar")]
         [Route("editar-produto/{id:guid}")]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -91,6 +96,7 @@ namespace DevAndrey.App.Controllers
 
             return View(produtoViewModel);
         }
+        [ClaimsAuthorize("Produto", "Editar")]
         [Route("editar-produto/{id:guid}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -127,6 +133,7 @@ namespace DevAndrey.App.Controllers
 
             return RedirectToAction("Index");
         }
+        [ClaimsAuthorize("Produto", "Excluir")]
         [Route("excluir-produto/{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -139,6 +146,7 @@ namespace DevAndrey.App.Controllers
 
             return View(produtoViewModel);
         }
+        [ClaimsAuthorize("Produto", "Excluir")]
         [Route("excluir-produto/{id:guid}")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
