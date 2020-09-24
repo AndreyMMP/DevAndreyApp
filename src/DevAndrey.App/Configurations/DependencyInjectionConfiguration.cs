@@ -1,5 +1,7 @@
 ﻿using DevAndrey.App.Extensions;
 using DevAndrey.Business.Interfaces;
+using DevAndrey.Business.Notifications;
+using DevAndrey.Business.Services;
 using DevAndrey.Data.Context;
 using DevAndrey.Data.Repository;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
@@ -17,9 +19,9 @@ namespace DevAndrey.App.Configurations
             services.AddScoped<IEnderecoRepository, EnderecoRepository>();
             services.AddSingleton<IValidationAttributeAdapterProvider, MoedaValidationAttributeAdapterProvider>();
 
-            //services.AddScoped<INotificador, Notificador>();
-            //services.AddScoped<IFornecedorService, FornecedorService>();
-            //services.AddScoped<IProdutoService, ProdutoService>();
+            services.AddScoped<INotificador, Notificador>();
+            services.AddScoped<IFornecedorService, FornecedorService>();
+            services.AddScoped<IProdutoService, ProdutoService>();
 
             return services;
         }

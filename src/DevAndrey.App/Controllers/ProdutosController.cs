@@ -15,13 +15,19 @@ namespace DevAndrey.App.Controllers
     public class ProdutosController : BaseController
     {
         private readonly IProdutoRepository _produtoRepository;
+        private readonly IProdutoService _produtoService;
         private readonly IFornecedorRepository _fornecedorRepository;
         private readonly IMapper _mapper;
 
-        public ProdutosController(IProdutoRepository produtoRepository, IFornecedorRepository fornecedorRepository, IMapper mapper)
+        public ProdutosController(IProdutoRepository produtoRepository,
+                                  IFornecedorRepository fornecedorRepository,
+                                  IProdutoService produtoService,
+                                  IMapper mapper,
+                                  INotificador notificador) : base(notificador)
         {
             _produtoRepository = produtoRepository;
             _fornecedorRepository = fornecedorRepository;
+            _produtoService = produtoService;
             _mapper = mapper;
         }
 
@@ -66,9 +72,10 @@ namespace DevAndrey.App.Controllers
             }
 
             produtoViewModel.Imagem = imgPrefixo + produtoViewModel.ImagemUpload.FileName;
-            await _produtoRepository.Adicionar(_mapper.Map<Produto>(produtoViewModel));
+            await _produtoService.Adicionar(_mapper.Map<Produto>(produtoViewModel));
 
-            //if (!OperacaoValida()) return View(produtoViewModel);
+            if (!OperacaoValida())
+                return View(produtoViewModel);
 
             return RedirectToAction("Index");
         }
@@ -89,18 +96,19 @@ namespace DevAndrey.App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, ProdutoViewModel produtoViewModel)
         {
-            if (id != produtoViewModel.Id) 
+            if (id != produtoViewModel.Id)
                 return NotFound();
 
             var produtoAtualizacao = await ObterProduto(id);
             produtoViewModel.FornecedorId = produtoAtualizacao.Fornecedor.Id;
             produtoViewModel.Imagem = produtoAtualizacao.Imagem;
 
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 produtoViewModel.Fornecedor = produtoAtualizacao.Fornecedor;
                 return View(produtoViewModel);
             }
-                
+
             if (produtoViewModel.ImagemUpload != null)
             {
                 var imgPrefixo = Guid.NewGuid() + "_";
@@ -112,9 +120,10 @@ namespace DevAndrey.App.Controllers
                 produtoViewModel.Imagem = imgPrefixo + produtoViewModel.ImagemUpload.FileName;
             }
 
-            await _produtoRepository.Atualizar(_mapper.Map<Produto>(produtoViewModel));
+            await _produtoService.Atualizar(_mapper.Map<Produto>(produtoViewModel));
 
-            //if (!OperacaoValida()) return View(produtoViewModel);
+            if (!OperacaoValida())
+                return View(produtoViewModel);
 
             return RedirectToAction("Index");
         }
@@ -142,7 +151,12 @@ namespace DevAndrey.App.Controllers
                 return NotFound();
             }
 
-            await _produtoRepository.Remover(id);
+            await _produtoService.Remover(id);
+
+            if (!OperacaoValida())
+                return View(produtoViewModel);
+
+            TempData["Sucesso"] = "Produto excluído com sucesso!";
 
             return RedirectToAction("Index");
         }
